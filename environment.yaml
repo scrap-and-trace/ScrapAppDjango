@@ -1,0 +1,4 @@
+name: scrap
+channels:
+  - defaults
+prefix: /Users/gregorcampbell/opt/anaconda3/envs/scrap
