@@ -7,12 +7,12 @@ from phonenumber_field.modelfields import PhoneNumberField
 class CustomUser(AbstractUser):
 
     username = models.Charfield()
-    email = models.EmailField('email address', unique=True)
+    email = models.EmailField(unique=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
-    profile_pic = models.ImageField(
-        default='default.jpg', upload_to='profile_pics')
+    # profile_pic = models.ImageField(
+    #     default='default.jpg', upload_to='profile_pics')
     phone = models.PhoneNumberField(blank=True)
     dob = models.DateField()
 
@@ -25,7 +25,7 @@ class Scrapbook(models.Model):
         CustomUser, on_delete=models.CASCADE, related_name='Scrapbooks')
     name = models.Charfield(maxLength=50)
     date_created = models.DateField(auto_now_add=True)
-    private = models.BooleanField()
+    friends_only = models.BooleanField()
 
 
 class Page(models.Model):
@@ -60,9 +60,9 @@ class Comment(models.Model):
 
 class Follow(models.Model):
     follower = models.ForeignKey(
-        CustomUser, on_delete=models.CASCADE, related_name='from_user')
+        CustomUser, on_delete=models.CASCADE, related_name='follower')
     scrapbook = models.ForeignKey(
-        Scrapbook, on_delete=models.CASCADE, related_name='followed_scrapbooks')
+        Scrapbook, on_delete=models.CASCADE, related_name='followed_scrapbook')
 
 
 # class Friend(models.Model):
