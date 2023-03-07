@@ -14,22 +14,29 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path, include
-from .api import RegisterAPI, LoginAPI, UserAPI, ProfilesViewSet, UpdateUserViewSet, FollowViewSet, InterestViewSet
+from accounts.api import RegisterAPI, LoginAPI
+from accounts.views import UpdateUserViewSet as my_views
 from knox import views as knox_views
 
 
-from .views import get_popular_languages
 from rest_framework import routers
+
 router = routers.DefaultRouter()
-router.register('profiles', ProfilesViewSet, 'profiles')
-router.register('user', UpdateUserViewSet, 'user')
-router.register('follow', FollowViewSet, 'follow')
+router.register(r'users', my_views)
+
 
 urlpatterns = [
-    path('api/auth/', include('knox.urls')),
+    path('', include(router.urls)),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('api/auth/register', RegisterAPI.as_view()),
     path('api/auth/login', LoginAPI.as_view()),
-    path('api/auth/user', UserAPI.as_view()),
-    path('api/auth/logout', knox_views.LogoutView.as_view(), name='knox_logout'),
-    path('api/', include(router.urls))
 ]
+
+# urlpatterns = [
+#     path('api/auth/', include('knox.urls')),
+#     path('api/auth/register', RegisterAPI.as_view()),
+#     path('api/auth/login', LoginAPI.as_view()),
+#     path('api/auth/user', UserAPI.as_view()),
+#     path('api/auth/logout', knox_views.LogoutView.as_view(), name='knox_logout'),
+#     path('api/', include(router.urls))
+# ]

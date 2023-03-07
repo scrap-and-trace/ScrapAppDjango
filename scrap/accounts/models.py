@@ -1,20 +1,21 @@
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
+from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
 
 
 class CustomUser(AbstractUser):
 
-    username = models.Charfield()
+    username = models.CharField(max_length=20)
     email = models.EmailField(unique=True)
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['username', ]
 
     # profile_pic = models.ImageField(
     #     default='default.jpg', upload_to='profile_pics')
-    phone = models.PhoneNumberField(blank=True)
-    dob = models.DateField()
+    phone = PhoneNumberField(blank=True)
+    dob = models.DateField(blank=True, null=True)
 
     def __str__(self):
         return self.email
@@ -23,7 +24,7 @@ class CustomUser(AbstractUser):
 class Scrapbook(models.Model):
     author = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, related_name='Scrapbooks')
-    name = models.Charfield(maxLength=50)
+    name = models.CharField(max_length=50)
     date_created = models.DateField(auto_now_add=True)
     friends_only = models.BooleanField()
 
@@ -31,13 +32,13 @@ class Scrapbook(models.Model):
 class Page(models.Model):
     scrapbook = models.ForeignKey(
         Scrapbook, on_delete=models.CASCADE, related_name='pages')
-    date_created = models.DateField(auto_now_add)
+    date_created = models.DateField(auto_now_add=True)
 
 
 class TextElement(models.Model):
     page = models.ForeignKey(
         Page, on_delete=models.CASCADE, related_name='TextElements')
-    text = models.Charfield(maxLength=255)
+    text = models.CharField(max_length=255)
     xCoord = models.IntegerField()
     yCoord = models.IntegerField()
 
@@ -55,7 +56,7 @@ class Comment(models.Model):
         Page, on_delete=models.CASCADE, related_name='comments')
     author = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, related_name='comments')
-    text = models.Charfield(maxLength=255)
+    text = models.CharField(max_length=255)
 
 
 class Follow(models.Model):
