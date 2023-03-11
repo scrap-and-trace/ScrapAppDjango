@@ -53,9 +53,9 @@ class ImageElement(models.Model):
 
 class Comment(models.Model):
     page = models.ForeignKey(
-        Page, on_delete=models.CASCADE, related_name='comments')
+        Page, on_delete=models.CASCADE, related_name='page')
     author = models.ForeignKey(
-        CustomUser, on_delete=models.CASCADE, related_name='comments')
+        CustomUser, on_delete=models.CASCADE, related_name='comment_author')
     text = models.CharField(max_length=255)
 
 

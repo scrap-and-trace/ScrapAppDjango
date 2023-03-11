@@ -14,22 +14,24 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path, include
-from accounts.api import RegisterAPI, LoginAPI
-from accounts.views import UpdateUserViewSet as my_views
+from accounts.api import RegisterAPI, LoginAPI, UserAPI
+from accounts.views import UserViewSet
 from knox import views as knox_views
 
 
 from rest_framework import routers
 
 router = routers.DefaultRouter()
-router.register(r'users', my_views)
+router.register('user', UserViewSet, 'user')
 
 
 urlpatterns = [
     path('', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    path('api/auth/register', RegisterAPI.as_view()),
-    path('api/auth/login', LoginAPI.as_view()),
+    path('api/auth/register/', RegisterAPI.as_view()),
+    path('api/auth/login/', LoginAPI.as_view()),
+    path('api/auth/user/', UserAPI.as_view()),
+
 ]
 
 # urlpatterns = [

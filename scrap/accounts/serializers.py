@@ -15,6 +15,10 @@ class PageSerializer(serializers.ModelSerializer):
         model = Page
         fields = '__all__'
 
+    def get_comments(self, obj):
+        comments = Comment.objects.filter(page=obj)
+        return list(comments.values_list("id", flat=True))
+
 
 class TextElementSerializer(serializers.ModelSerializer):
     class Meta:
@@ -39,7 +43,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['id', 'username', 'first_name',
-                  'last_name', 'username', 'email', 'dob', 'phone', ]
+                  'last_name', 'email', 'dob', 'phone', ]
 
     def get_following(self, obj):
         follows = Follow.objects.filter(follower=obj)

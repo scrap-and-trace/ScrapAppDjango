@@ -1,7 +1,8 @@
-from .models import CustomUser
+from .models import CustomUser, Comment, Follow, Scrapbook
 from rest_framework import viewsets
 from rest_framework import permissions
-from .serializers import UserSerializer
+from rest_framework.response import Response
+from .serializers import UserSerializer, CommentSerializer, ScrapbookSerializer
 
 
 from rest_framework import filters
@@ -34,7 +35,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 #         return Response(serializer.data)
 
 
-class UpdateUserViewSet(viewsets.ModelViewSet):
+class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
 
@@ -59,3 +60,20 @@ class UpdateUserViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+    def get_queryset(self):
+        return Comment.objects.all()
+
+
+class ScrapbookViewSet(viewsets.ModelViewSet):
+    queryset = Scrapbook.objects.all()
+    serializer_class = ScrapbookSerializer
+
+    def get_followers(self, obj):
+        followers = Follow.objects.filter(follower=self.kwargs["pk"])
+        return list(followers.values_list("follower", flat=True))
