@@ -10,8 +10,8 @@ class ScrapbookSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Scrapbook
-        fields = ['id', 'name', 'username', 'pages',
-                  'date_created', 'friends_only']
+        fields = ['id', 'title', 'username', 'pages',
+                  'date_created', 'author', 'friends_only']
 
     def get_pages(self, obj):
         pages = Page.objects.filter(scrapbook=obj)
