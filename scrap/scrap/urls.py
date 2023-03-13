@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.urls import path, include
 from accounts.api import RegisterAPI, LoginAPI, UserAPI, ScrapbookAPI
-from accounts.views import UserViewSet
+from accounts.views import UserViewSet, FollowViewSet
 from knox import views as knox_views
 
 
@@ -23,6 +23,7 @@ from rest_framework import routers
 
 router = routers.DefaultRouter()
 router.register('user', UserViewSet, 'user')
+router.register('follow', FollowViewSet, 'follow')
 
 
 urlpatterns = [

@@ -1,8 +1,8 @@
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from knox.models import AuthToken
-from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, ScrapbookSerializer
-from .models import CustomUser, Scrapbook
+from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, ScrapbookSerializer, FollowSerializer
+from .models import CustomUser, Scrapbook, Follow
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from django.contrib.auth import login
@@ -63,3 +63,17 @@ class ScrapbookAPI(generics.ListCreateAPIView):
     # permission_classes = [
     #     permissions.IsAuthenticated,
     # ]
+
+
+# class FollowAPI(generics.ListCreateAPIView):
+#     # permission_classes = [
+#     #     permissions.IsAuthenticated,
+#     # ]
+#     serializer_class = FollowSerializer
+#     queryset = Follow.objects.all()
+
+#     def get_object(self):
+#         books = Follow.objects.filter(follower=self.request.user)
+#         serializer = self.get_serializer(books, many=True)
+
+#         return serializer.data
