@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path, include
-from accounts.api import RegisterAPI, LoginAPI, UserAPI
+from accounts.api import RegisterAPI, LoginAPI, UserAPI, ScrapbookAPI
 from accounts.views import UserViewSet
 from knox import views as knox_views
 
@@ -31,6 +31,7 @@ urlpatterns = [
     path('api/auth/register/', RegisterAPI.as_view()),
     path('api/auth/login/', LoginAPI.as_view()),
     path('api/auth/user/', UserAPI.as_view()),
+    path('api/auth/scrapbooks/', ScrapbookAPI.as_view()),
 
 ]
 

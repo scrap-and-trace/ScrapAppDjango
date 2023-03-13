@@ -5,53 +5,67 @@ from django.http import JsonResponse, response
 
 
 class ScrapbookSerializer(serializers.ModelSerializer):
+    pages = serializers.SerializerMethodField()
+
     class Meta:
         model = Scrapbook
-        fields = '__all__'
+        fields = ['id', 'title', 'username', 'pages',
+                  'date_created', ]
+
+    def get_pages(self, obj):
+        pages = Page.objects.filter(scrapbook=obj)
+        return list(pages.values_list("id", flat=True))
 
 
 class PageSerializer(serializers.ModelSerializer):
+    comments = serializers.SerializerMethodField()
+    username = serializers.SerializerMethodField()
+
     class Meta:
         model = Page
-        fields = '__all__'
+        fields = ['id', 'title', 'body', 'username',
+                  'date_created', 'scrapbook', 'comments', ]
 
     def get_comments(self, obj):
         comments = Comment.objects.filter(page=obj)
         return list(comments.values_list("id", flat=True))
 
-
-class TextElementSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TextElement
-        fields = '__all__'
+    def get_username(self, obj):
+        return CustomUser.objects.get(username=obj.scrapbook.author.username)
 
 
-class ImageElementSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ImageElement
-        fields = '__all__'
+# class TextElementSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = TextElement
+#         fields = '__all__'
+
+
+# class ImageElementSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = ImageElement
+#         fields = '__all__'
 
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = '__all__'
-
+        fields = ['id', 'page', 'username', 'body', ]
 
 # User Serializer
+
+
 class UserSerializer(serializers.ModelSerializer):
+    follows = serializers.SerializerMethodField()
+    comments = serializers.SerializerMethodField()
+
     class Meta:
         model = CustomUser
         fields = ['id', 'username', 'first_name',
-                  'last_name', 'email', 'dob', 'phone', ]
+                  'last_name', 'email', 'dob', 'phone', 'follows', ]
 
     def get_following(self, obj):
         follows = Follow.objects.filter(follower=obj)
         return list(follows.values_list("followed_scrabook", flat=True))
-
-    def get_comments(self, obj):
-        commented = Comment.objects.filter(author=obj)
-        return list(commented.values_list("text", flat=True))
 
 
 # Register Serializer
