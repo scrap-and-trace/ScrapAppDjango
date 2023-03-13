@@ -1,20 +1,24 @@
 from rest_framework import serializers
-from .models import CustomUser, TextElement, ImageElement, Scrapbook, Page, Comment
+from .models import CustomUser, TextElement, ImageElement, Scrapbook, Page, Comment, Follow
 from django.contrib.auth import authenticate
 from django.http import JsonResponse, response
 
 
 class ScrapbookSerializer(serializers.ModelSerializer):
     pages = serializers.SerializerMethodField()
+    username = serializers.SerializerMethodField()
 
     class Meta:
         model = Scrapbook
-        fields = ['id', 'title', 'username', 'pages',
-                  'date_created', ]
+        fields = ['id', 'name', 'username', 'pages',
+                  'date_created', 'friends_only']
 
     def get_pages(self, obj):
         pages = Page.objects.filter(scrapbook=obj)
         return list(pages.values_list("id", flat=True))
+
+    def get_username(self, obj):
+        return obj.author.username
 
 
 class PageSerializer(serializers.ModelSerializer):
@@ -55,17 +59,16 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    follows = serializers.SerializerMethodField()
-    comments = serializers.SerializerMethodField()
+    following = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomUser
         fields = ['id', 'username', 'first_name',
-                  'last_name', 'email', 'dob', 'phone', 'follows', ]
+                  'last_name', 'email', 'dob', 'phone', 'following', ]
 
     def get_following(self, obj):
         follows = Follow.objects.filter(follower=obj)
-        return list(follows.values_list("followed_scrabook", flat=True))
+        return list(follows.values_list("scrapbook", flat=True))
 
 
 # Register Serializer

@@ -60,6 +60,6 @@ class ScrapbookAPI(generics.ListCreateAPIView):
 
     queryset = Scrapbook.objects.all()
 
-    permission_classes = [
-        permissions.IsAuthenticated,
-    ]
+    # permission_classes = [
+    #     permissions.IsAuthenticated,
+    # ]
