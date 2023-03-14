@@ -68,20 +68,6 @@ class ScrapbookAPI(generics.ListCreateAPIView):
     # ]
 
 
-# class FollowAPI(generics.ListCreateAPIView):
-#     # permission_classes = [
-#     #     permissions.IsAuthenticated,
-#     # ]
-#     serializer_class = FollowSerializer
-#     queryset = Follow.objects.all()
-
-#     def get_object(self):
-#         books = Follow.objects.filter(follower=self.request.user)
-#         serializer = self.get_serializer(books, many=True)
-
-#         return serializer.data
-
-
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
@@ -90,7 +76,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = {
-        'id': ["in", "exact"],  # note the 'in' field
+        'id': ["exact"],  # note the 'in' field
     }
 
     def get_queryset(self):
@@ -126,14 +112,14 @@ class CommentViewSet(viewsets.ModelViewSet):
 #         return list(followers.values_list("follower", flat=True))
 
 
-class FollowListCreateAPIView(mixins.DestroyModelMixin, generics.ListCreateAPIView):
+class FollowListCreateAPI(mixins.DestroyModelMixin, generics.ListCreateAPIView):
 
     queryset = Follow.objects.all()
 
-    # filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    # filterset_fields = {
-    #     'id': ["in", "exact"],
-    # }
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = {
+        'id': ["in", "exact"],  # note the 'in' field
+    }
 
     def get_serializer_class(self):
         if (self.request.method == "POST"):
@@ -148,7 +134,7 @@ class FollowListCreateAPIView(mixins.DestroyModelMixin, generics.ListCreateAPIVi
         return Follow.objects.filter(follower=is_following)
 
 
-class FollowDestroyAPIView(mixins.DestroyModelMixin, generics.GenericAPIView):
+class FollowDestroyAPI(mixins.DestroyModelMixin, generics.GenericAPIView):
     queryset = Follow.objects.all()
     serializer_class = FollowSerializer
 
@@ -158,3 +144,15 @@ class FollowDestroyAPIView(mixins.DestroyModelMixin, generics.GenericAPIView):
 
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
+
+
+class SearchUsersAPI(generics.ListAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserSerializer
+
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['username', 'email']
+
+    # def get_queryset(self):
+    #     search = self.kwargs['pk']
+    #     return CustomUser.objects.filter(username=search)
