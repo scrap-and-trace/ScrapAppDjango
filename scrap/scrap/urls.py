@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.urls import path, include
 from accounts.api import RegisterAPI, LoginAPI, UserAPI, ScrapbookAPI
-from accounts.views import UserViewSet, FollowViewSet
+from accounts.api import UserViewSet, FollowListCreateAPIView, FollowDestroyAPIView
 from knox import views as knox_views
 
 
@@ -23,7 +23,6 @@ from rest_framework import routers
 
 router = routers.DefaultRouter()
 router.register('user', UserViewSet, 'user')
-router.register('follow', FollowViewSet, 'follow')
 
 
 urlpatterns = [
@@ -33,6 +32,9 @@ urlpatterns = [
     path('api/auth/login/', LoginAPI.as_view()),
     path('api/auth/user/', UserAPI.as_view()),
     path('api/auth/scrapbooks/', ScrapbookAPI.as_view()),
+    path('api/auth/followlist/<int:pk>/', FollowListCreateAPIView.as_view()),
+    path('api/auth/deletefollow/<int:pk>/', FollowDestroyAPIView.as_view()),
+
 
 ]
 

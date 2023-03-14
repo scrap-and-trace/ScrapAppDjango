@@ -56,10 +56,22 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ['id', 'page', 'username', 'body', ]
 
 
-class FollowSerializer(serializers.ModelSerializer):
+class FollowCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Follow
         fields = ['id', 'follower', 'scrapbook', ]
+
+
+class FollowSerializer(serializers.ModelSerializer):
+    book = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Follow
+        fields = ['id', 'book', ]
+
+    def get_book(self, obj):
+        book = Scrapbook.objects.get(id=obj.scrapbook.id)
+        return ScrapbookSerializer(book).data
 
 # User Serializer
 

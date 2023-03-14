@@ -1,10 +1,13 @@
 from rest_framework import generics, permissions
+from rest_framework import viewsets, mixins
+
+from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from knox.models import AuthToken
-from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, ScrapbookSerializer, FollowSerializer
-from .models import CustomUser, Scrapbook, Follow
+from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, ScrapbookSerializer, FollowSerializer, CommentSerializer, FollowCreateSerializer
+from .models import CustomUser, Scrapbook, Follow, Comment
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
 from django.contrib.auth import login
 
 
@@ -77,3 +80,81 @@ class ScrapbookAPI(generics.ListCreateAPIView):
 #         serializer = self.get_serializer(books, many=True)
 
 #         return serializer.data
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserSerializer
+
+    search_fields = ['first_name', 'last_name']
+
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = {
+        'id': ["in", "exact"],  # note the 'in' field
+    }
+
+    def get_queryset(self):
+        return CustomUser.objects.all()
+
+    def get_object(self):
+        obj = get_object_or_404(
+            CustomUser.objects.filter(id=self.kwargs["pk"]))
+        return obj
+
+    def update(self, request, *args, **kwargs):
+        serializer = self.serializer_class(
+            request.user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+    def get_queryset(self):
+        return Comment.objects.all()
+
+
+# class ScrapbookViewSet(viewsets.ModelViewSet):
+#     queryset = Scrapbook.objects.all()
+#     serializer_class = ScrapbookSerializer
+
+#     def get_followers(self, obj):
+#         followers = Follow.objects.filter(follower=self.kwargs["pk"])
+#         return list(followers.values_list("follower", flat=True))
+
+
+class FollowListCreateAPIView(mixins.DestroyModelMixin, generics.ListCreateAPIView):
+
+    queryset = Follow.objects.all()
+
+    # filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    # filterset_fields = {
+    #     'id': ["in", "exact"],
+    # }
+
+    def get_serializer_class(self):
+        if (self.request.method == "POST"):
+            serializer_class = FollowCreateSerializer
+        else:
+            serializer_class = FollowSerializer
+
+        return serializer_class
+
+    def get_queryset(self):
+        is_following = self.kwargs['pk']
+        return Follow.objects.filter(follower=is_following)
+
+
+class FollowDestroyAPIView(mixins.DestroyModelMixin, generics.GenericAPIView):
+    queryset = Follow.objects.all()
+    serializer_class = FollowSerializer
+
+    def get_queryset(self):
+        followid = self.kwargs['pk']
+        return Follow.objects.filter(id=followid)
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
