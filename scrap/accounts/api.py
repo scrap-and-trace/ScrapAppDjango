@@ -151,7 +151,7 @@ class SearchUsersAPI(generics.ListAPIView):
     serializer_class = UserSerializer
 
     filter_backends = [filters.SearchFilter]
-    search_fields = ['username', 'email']
+    search_fields = ['username', 'first_name', 'last_name', ]
 
     # def get_queryset(self):
     #     search = self.kwargs['pk']
