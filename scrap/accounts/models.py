@@ -23,7 +23,7 @@ class CustomUser(AbstractUser):
 
 class Scrapbook(models.Model):
     author = models.ForeignKey(
-        CustomUser, on_delete=models.CASCADE, related_name='Scrapbooks')
+        CustomUser, on_delete=models.CASCADE, related_name='scrapbooks')
     title = models.CharField(max_length=50)
     date_created = models.DateField(auto_now_add=True)
     friends_only = models.BooleanField()

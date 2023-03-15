@@ -5,7 +5,7 @@ from django.http import JsonResponse, response
 
 
 class ScrapbookSerializer(serializers.ModelSerializer):
-    pages = serializers.SerializerMethodField()
+    pages = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     username = serializers.SerializerMethodField()
 
     class Meta:
@@ -13,29 +13,32 @@ class ScrapbookSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'username', 'pages',
                   'date_created', 'author', 'friends_only']
 
-    def get_pages(self, obj):
-        pages = Page.objects.filter(scrapbook=obj)
-        return list(pages.values_list("id", flat=True))
-
     def get_username(self, obj):
         return obj.author.username
 
 
 class PageSerializer(serializers.ModelSerializer):
-    comments = serializers.SerializerMethodField()
-    username = serializers.SerializerMethodField()
+
+    comments = serializers.SlugRelatedField(
+        many=True,
+        read_only=True,
+        slug_field='body'
+    )
+    # comment_author = serializers.PrimaryKeyRelatedField(
+    #     queryset=Page.objects.all())
+    # username = CustomUser.objects.get(username=comment_author.username)
 
     class Meta:
         model = Page
-        fields = ['id', 'title', 'body', 'username',
-                  'date_created', 'scrapbook', 'comments', ]
+        fields = ['id', 'title', 'body',
+                  'date_created', 'scrapbook', 'comments', 'longitude', 'latitude', ]
 
-    def get_comments(self, obj):
-        comments = Comment.objects.filter(page=obj)
-        return list(comments.values_list("id", flat=True))
+    # def get_comments(self, obj):
+    #     comments = Comment.objects.filter(page=obj)
+    #     return list(comments.values_list("id", flat=True))
 
-    def get_username(self, obj):
-        return CustomUser.objects.get(username=obj.scrapbook.author.username)
+    # def get_username(self, obj):
+    #     return CustomUser.objects.get(username=obj.scrapbook.author.username)
 
 
 # class TextElementSerializer(serializers.ModelSerializer):
@@ -53,7 +56,7 @@ class PageSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = ['id', 'page', 'username', 'body', ]
+        fields = ['id', 'page', 'authorid', 'body', ]
 
 
 class FollowCreateSerializer(serializers.ModelSerializer):
@@ -79,6 +82,7 @@ class FollowSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     following = serializers.SerializerMethodField()
     scrapbooks = serializers.SerializerMethodField()
+    # scrapbooks = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = CustomUser

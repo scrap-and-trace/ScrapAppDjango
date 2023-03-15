@@ -5,8 +5,8 @@ from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from knox.models import AuthToken
-from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, ScrapbookSerializer, FollowSerializer, CommentSerializer, FollowCreateSerializer
-from .models import CustomUser, Scrapbook, Follow, Comment
+from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, ScrapbookSerializer, FollowSerializer, CommentSerializer, FollowCreateSerializer, PageSerializer
+from .models import CustomUser, Scrapbook, Follow, Comment, Page
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import login
 
@@ -72,7 +72,7 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
 
-    search_fields = ['first_name', 'last_name']
+    # search_fields = ['first_name', 'last_name']
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = {
@@ -98,9 +98,6 @@ class UserViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-
-    def get_queryset(self):
-        return Comment.objects.all()
 
 
 # class ScrapbookViewSet(viewsets.ModelViewSet):
@@ -153,6 +150,11 @@ class SearchUsersAPI(generics.ListAPIView):
     filter_backends = [filters.SearchFilter]
     search_fields = ['username', 'first_name', 'last_name', ]
 
+
+class PageAPI(viewsets.ModelViewSet):
+    queryset = Page.objects.all()
+    serializer_class = PageSerializer
+
     # def get_queryset(self):
-    #     search = self.kwargs['pk']
-    #     return CustomUser.objects.filter(username=search)
+    #     pageid = self.kwargs['pk']
+    #     return Page.objects.get(id=pageid)
