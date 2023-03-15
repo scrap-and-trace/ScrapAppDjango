@@ -1,5 +1,5 @@
 from rest_framework import generics, permissions
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, status
 
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
@@ -155,6 +155,12 @@ class PageAPI(viewsets.ModelViewSet):
     queryset = Page.objects.all()
     serializer_class = PageSerializer
 
+    def destroy(self, request, *args, **kwargs):
+        page = self.get_object()
+        if page.scrapbook.author != request.user:
+            content = {'Error': 'This is not your page!'}
+            return Response(content, status=status.HTTP_403_FORBIDDEN)
+        return super().destroy(request, *args, **kwargs)
     # def get_queryset(self):
     #     pageid = self.kwargs['pk']
     #     return Page.objects.get(id=pageid)
