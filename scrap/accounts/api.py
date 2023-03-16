@@ -5,7 +5,7 @@ from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from knox.models import AuthToken
-from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, ScrapbookSerializer, FollowSerializer, CommentSerializer, FollowCreateSerializer, PageSerializer
+from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, ScrapbookSerializer, FollowSerializer, CommentSerializer, FollowCreateSerializer, PageSerializer, CommentCreateSerializer
 from .models import CustomUser, Scrapbook, Follow, Comment, Page
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import login
@@ -117,8 +117,14 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
-    serializer_class = CommentSerializer
 
+    def get_serializer_class(self):
+        if (self.request.method == "POST"):
+            serializer_class = CommentCreateSerializer
+        else:
+            serializer_class = CommentSerializer
+
+        return serializer_class
 
 # class ScrapbookViewSet(viewsets.ModelViewSet):
 #     queryset = Scrapbook.objects.all()

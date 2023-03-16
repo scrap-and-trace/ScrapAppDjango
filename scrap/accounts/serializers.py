@@ -136,6 +136,13 @@ class CommentSerializer(serializers.ModelSerializer):
         })
         return author_data
 
+class CommentCreateSerializer(serializers.ModelSerializer):
+
+
+    class Meta:
+        model=Comment
+        fields = ['authorid', 'page', 'body']
+
 
 class PageSerializer(serializers.ModelSerializer):
     comments = serializers.SerializerMethodField()
