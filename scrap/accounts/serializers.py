@@ -55,7 +55,7 @@ class FollowSerializer(serializers.ModelSerializer):
         fields = ['id', 'user_details', 'scrapbook', ]
 
     def get_user_details(self, follow):
-        user = CustomUser.objects.filter(id=follow.follower.id).first()
+        user = CustomUser.objects.filter(id=follow.follower.id).last()
         user_data = []
         user_data.append({
             'follower_id': user.id,
@@ -130,16 +130,14 @@ class CommentSerializer(serializers.ModelSerializer):
     def get_author_data(self, comment):
         author = CustomUser.objects.get(comment_author=comment)
         author_data = []
-        author_data.append({'id': author.id,
-                            'author_id': author.id,
-                            'author_username': author.username,
-                            })
+        author_data.append({
+            'author_id': author.id,
+            'author_username': author.username,
+        })
         return author_data
 
 
 class PageSerializer(serializers.ModelSerializer):
-    # comments = CommentSerializer(many=True, read_only=True)
-
     comments = serializers.SerializerMethodField()
 
     class Meta:

@@ -13,8 +13,10 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.contrib import admin
+
 from django.urls import path, include
-from accounts.api import RegisterAPI, LoginAPI, UserAPI, ScrapbookAPI, FollowListCreateAPI, FollowDestroyAPI, SearchUsersAPI
+from accounts.api import RegisterAPI, LoginAPI, UserAPI, ScrapbookAPI, FollowListCreateAPI, FollowDestroyAPI, SearchUsersAPI, ScrapbookDestroyAPI
 from accounts.api import UserViewSet, PageAPI, CommentViewSet
 from knox import views as knox_views
 
@@ -28,6 +30,8 @@ router.register('comment', CommentViewSet, 'comment')
 
 
 urlpatterns = [
+    path('admin/', admin.site.urls),
+
     path('', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('api/auth/register/', RegisterAPI.as_view()),
@@ -37,6 +41,8 @@ urlpatterns = [
     path('api/auth/followlist/<int:pk>/', FollowListCreateAPI.as_view()),
     path('api/auth/deletefollow/<int:pk>/', FollowDestroyAPI.as_view()),
     path('api/auth/searchUsers/', SearchUsersAPI.as_view()),
+    path('api/auth/deletescrapbook/<int:pk>/', ScrapbookDestroyAPI.as_view()),
+
     # path('api/auth/page/<int:pk>', PageAPI.as_view()),
 
 

@@ -72,6 +72,22 @@ class ScrapbookAPI(generics.ListCreateAPIView):
     # ]
 
 
+class ScrapbookDestroyAPI(mixins.DestroyModelMixin, generics.GenericAPIView):
+    queryset = Scrapbook.objects.all()
+    serializer_class = ScrapbookSerializer
+
+    # def get_queryset(self):
+    #     scrapbookid = self.kwargs['pk']
+    #     return Scrapbook.objects.filter(id=scrapbookid)
+
+    def delete(self, request, *args, **kwargs):
+        scrapbook = self.get_object()
+        if scrapbook.author != request.user:
+            content = {'Error': 'You cannot delete someone else\'s scrapbook!'}
+            return Response(content, status=status.HTTP_403_FORBIDDEN)
+        return self.destroy(request, *args, **kwargs)
+
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
@@ -113,7 +129,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 #         return list(followers.values_list("follower", flat=True))
 
 
-class FollowListCreateAPI(mixins.DestroyModelMixin, generics.ListCreateAPIView):
+class FollowListCreateAPI(generics.ListCreateAPIView):
 
     queryset = Follow.objects.all()
 
@@ -139,11 +155,11 @@ class FollowDestroyAPI(mixins.DestroyModelMixin, generics.GenericAPIView):
     queryset = Follow.objects.all()
     serializer_class = FollowSerializer
 
-    def get_queryset(self):
-        followid = self.kwargs['pk']
-        return Follow.objects.filter(id=followid)
-
     def delete(self, request, *args, **kwargs):
+        follow = Follow.objects.get(id=self.kwargs['pk'])
+        if follow.follower != request.user:
+            content = {'Error': 'You cannot unfollow someone else for them!'}
+            return Response(content, status=status.HTTP_403_FORBIDDEN)
         return self.destroy(request, *args, **kwargs)
 
 
