@@ -63,6 +63,10 @@ class ScrapbookAPI(generics.ListCreateAPIView):
 
     queryset = Scrapbook.objects.all()
 
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = {
+        'id': ["exact"],  # note the 'in' field
+    }
     # permission_classes = [
     #     permissions.IsAuthenticated,
     # ]
@@ -113,9 +117,9 @@ class FollowListCreateAPI(mixins.DestroyModelMixin, generics.ListCreateAPIView):
 
     queryset = Follow.objects.all()
 
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filter_backends = [DjangoFilterBackend, ]
     filterset_fields = {
-        'id': ["in", "exact"],  # note the 'in' field
+        'id': ["exact"],
     }
 
     def get_serializer_class(self):
@@ -154,6 +158,11 @@ class SearchUsersAPI(generics.ListAPIView):
 class PageAPI(viewsets.ModelViewSet):
     queryset = Page.objects.all()
     serializer_class = PageSerializer
+
+    filter_backends = [DjangoFilterBackend, ]
+    filterset_fields = {
+        'id': ["exact"],
+    }
 
     def destroy(self, request, *args, **kwargs):
         page = self.get_object()

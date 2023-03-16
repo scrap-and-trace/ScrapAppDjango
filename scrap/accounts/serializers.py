@@ -58,7 +58,7 @@ class FollowSerializer(serializers.ModelSerializer):
         user = CustomUser.objects.filter(id=follow.follower.id).first()
         user_data = []
         user_data.append({
-            'follower': user.id,
+            'follower_id': user.id,
             'follower_username': user.username,
         })
         return user_data
@@ -68,26 +68,24 @@ class FollowSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    follower = FollowSerializer(many=True, read_only=True)
+    # following = FollowSerializer(many=True, read_only=True)
+    following = serializers.SerializerMethodField()
     scrapbooks = ScrapbookSerializer(many=True, read_only=True)
-    # following = serializers.SerializerMethodField()
-    # scrapbooks = serializers.SerializerMethodField()
-    # scrapbooks = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = CustomUser
         fields = ['id', 'username', 'first_name',
-                  'last_name', 'email', 'dob', 'phone', 'follower', 'scrapbooks', ]
+                  'last_name', 'email', 'dob', 'phone', 'following', 'scrapbooks', ]
 
-    # def get_following(self, obj):
-    #     follows = Follow.objects.filter(follower=obj)
-    #     serializer = FollowSerializer(follows, many=True)
-    #     return serializer.data
-
-    # def get_scrapbooks(self, obj):
-    #     books = Scrapbook.objects.filter(author=obj)
-    #     serializer = ScrapbookSerializer(books, many=True)
-    #     return serializer.data
+    def get_following(self, user):
+        following = Follow.objects.filter(follower=user)
+        following_data = []
+        for follow in following:
+            following_data.append({
+                'id': follow.id,
+                'scrapbook': ScrapbookSerializer(follow.scrapbook).data
+            })
+        return following_data
 
 
 # Register Serializer

@@ -84,7 +84,7 @@ class Comment(models.Model):
 
 class Follow(models.Model):
     follower = models.ForeignKey(
-        CustomUser, on_delete=models.CASCADE, related_name='follower')
+        CustomUser, on_delete=models.CASCADE, related_name='following')
     scrapbook = models.ForeignKey(
         Scrapbook, on_delete=models.CASCADE, related_name='followed_scrapbook')
 
