@@ -29,15 +29,6 @@ class Scrapbook(models.Model):
     friends_only = models.BooleanField()
 
 
-# class Page(models.Model):
-#     scrapbook = models.ForeignKey(
-#         Scrapbook, on_delete=models.CASCADE, related_name='pages')
-#     date_created = models.DateField(auto_now_add=True)
-#     longitude = models.DecimalField(
-#         max_digits=9, decimal_places=6, blank=True, null=True)
-#     latitude = models.DecimalField(
-#         max_digits=9, decimal_places=6, blank=True, null=True)
-
 class Page(models.Model):
     scrapbook = models.ForeignKey(
         Scrapbook, on_delete=models.CASCADE, related_name='pages')
@@ -66,14 +57,6 @@ class ImageElement(models.Model):
     yCoord = models.IntegerField()
 
 
-# class Comment(models.Model):
-#     page = models.ForeignKey(
-#         Page, on_delete=models.CASCADE, related_name='page')
-#     author = models.ForeignKey(
-#         CustomUser, on_delete=models.CASCADE, related_name='comment_author')
-#     text = models.CharField(max_length=255)
-
-
 class Comment(models.Model):
     page = models.ForeignKey(
         Page, on_delete=models.CASCADE, related_name='comments')
@@ -87,6 +70,11 @@ class Follow(models.Model):
         CustomUser, on_delete=models.CASCADE, related_name='following')
     scrapbook = models.ForeignKey(
         Scrapbook, on_delete=models.CASCADE, related_name='followed_scrapbook')
+
+
+class PageLikes(models.Model):
+    liker = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='liker')
+    liked_page = models.ForeignKey(Page, on_delete=models.CASCADE, related_name='liked_page')
 
 
 # class Friend(models.Model):

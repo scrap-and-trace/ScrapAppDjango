@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser, TextElement, ImageElement, Scrapbook, Page, Comment, Follow
+from .models import CustomUser, TextElement, ImageElement, Scrapbook, Page, Comment, Follow, PageLikes
 from django.contrib.auth import authenticate
 from django.http import JsonResponse, response
 
@@ -129,28 +129,28 @@ class CommentSerializer(serializers.ModelSerializer):
 
     def get_author_data(self, comment):
         author = CustomUser.objects.get(comment_author=comment)
-        author_data = []
-        author_data.append({
+        author_data = {
             'author_id': author.id,
             'author_username': author.username,
-        })
+        }
         return author_data
+
 
 class CommentCreateSerializer(serializers.ModelSerializer):
 
-
     class Meta:
-        model=Comment
+        model = Comment
         fields = ['authorid', 'page', 'body']
 
 
 class PageSerializer(serializers.ModelSerializer):
     comments = serializers.SerializerMethodField()
+    no_of_likes = serializers.SerializerMethodField()
 
     class Meta:
         model = Page
         fields = ['id', 'title', 'body',
-                  'date_created', 'scrapbook', 'comments', 'longitude', 'latitude', ]
+                  'date_created', 'scrapbook', 'comments', 'longitude', 'latitude', 'no_of_likes', ]
 
     def get_comments(self, page):
         comments = Comment.objects.filter(page=page)
@@ -163,3 +163,37 @@ class PageSerializer(serializers.ModelSerializer):
                 'body': comment.body
             })
         return comment_data
+
+    def get_no_of_likes(self, page):
+        likes = PageLikes.objects.filter(liked_page=page)
+        count = 0
+        for like in likes:
+            count += 1
+        return count
+
+
+class LikeListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PageLikes
+        fields = ['id', 'liker', 'liked_page', ]
+
+
+class LikeSerializer(serializers.ModelSerializer):
+    liker_details = serializers.SerializerMethodField()
+
+    class Meta:
+        model = PageLikes
+        fields = ['id', 'liker', 'liked_page', 'liker_details', ]
+
+    def get_liker_details(self, like):
+        user = CustomUser.objects.get(
+            liker=like)
+        liker_data = {
+            'liker_username': user.username,
+        }
+        # liker_data.append({
+        #     'liker_id': liker.id,
+        #     'liker_username': liker.username,
+        # })
+        return liker_data

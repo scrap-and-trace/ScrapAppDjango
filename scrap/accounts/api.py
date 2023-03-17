@@ -5,8 +5,10 @@ from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from knox.models import AuthToken
-from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, ScrapbookSerializer, FollowSerializer, CommentSerializer, FollowCreateSerializer, PageSerializer, CommentCreateSerializer
-from .models import CustomUser, Scrapbook, Follow, Comment, Page
+from .serializers import (UserSerializer, RegisterSerializer, LoginSerializer,
+                          ScrapbookSerializer, FollowSerializer, CommentSerializer, FollowCreateSerializer,
+                          PageSerializer, CommentCreateSerializer, LikeSerializer, LikeListSerializer)
+from .models import CustomUser, Scrapbook, Follow, Comment, Page, PageLikes
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import login
 
@@ -126,14 +128,6 @@ class CommentViewSet(viewsets.ModelViewSet):
 
         return serializer_class
 
-# class ScrapbookViewSet(viewsets.ModelViewSet):
-#     queryset = Scrapbook.objects.all()
-#     serializer_class = ScrapbookSerializer
-
-#     def get_followers(self, obj):
-#         followers = Follow.objects.filter(follower=self.kwargs["pk"])
-#         return list(followers.values_list("follower", flat=True))
-
 
 class FollowListCreateAPI(generics.ListCreateAPIView):
 
@@ -192,6 +186,51 @@ class PageAPI(viewsets.ModelViewSet):
             content = {'Error': 'This is not your page!'}
             return Response(content, status=status.HTTP_403_FORBIDDEN)
         return super().destroy(request, *args, **kwargs)
-    # def get_queryset(self):
-    #     pageid = self.kwargs['pk']
-    #     return Page.objects.get(id=pageid)
+
+
+class PageLikesListAPI(generics.ListCreateAPIView):
+
+    queryset = PageLikes.objects.all()
+
+    filter_backends = [DjangoFilterBackend, ]
+    filterset_fields = {
+        'id': ["exact"],
+    }
+
+    def get_serializer_class(self):
+        if (self.request.method == "POST"):
+            serializer_class = LikeListSerializer
+        else:
+            serializer_class = LikeSerializer
+
+        return serializer_class
+
+    def get_queryset(self):
+        likes = self.kwargs['pk']
+        return PageLikes.objects.filter(liked_page=likes)
+
+
+class PageLikesDeleteAPI(mixins.DestroyModelMixin, generics.GenericAPIView):
+    queryset = PageLikes.objects.all()
+    serializer_class = LikeSerializer
+
+    def delete(self, request, *args, **kwargs):
+        like = PageLikes.objects.get(id=self.kwargs['pk'])
+        if like.liker != request.user:
+            content = {
+                'Error': 'You cannot remove someone else\'s like for them!'}
+            return Response(content, status=status.HTTP_403_FORBIDDEN)
+        return self.destroy(request, *args, **kwargs)
+
+
+class UserLikesAPI(generics.ListAPIView):
+    serializer_class = LikeListSerializer
+
+    filter_backends = [DjangoFilterBackend, ]
+    filterset_fields = {
+        'id': ["exact"],
+    }
+
+    def get_queryset(self):
+        likerid = self.kwargs['pk']
+        return PageLikes.objects.filter(liker=likerid)

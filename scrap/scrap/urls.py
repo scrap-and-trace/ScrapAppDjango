@@ -16,7 +16,9 @@ Including another URLconf
 from django.contrib import admin
 
 from django.urls import path, include
-from accounts.api import RegisterAPI, LoginAPI, UserAPI, ScrapbookAPI, FollowListCreateAPI, FollowDestroyAPI, SearchUsersAPI, ScrapbookDestroyAPI
+from accounts.api import (RegisterAPI, LoginAPI, UserAPI, ScrapbookAPI, FollowListCreateAPI,
+                          FollowDestroyAPI, SearchUsersAPI, ScrapbookDestroyAPI, PageLikesListAPI,
+                          PageLikesDeleteAPI, UserLikesAPI,)
 from accounts.api import UserViewSet, PageAPI, CommentViewSet
 from knox import views as knox_views
 
@@ -34,16 +36,30 @@ urlpatterns = [
 
     path('', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+
+    # User APIs
     path('api/auth/register/', RegisterAPI.as_view()),
     path('api/auth/login/', LoginAPI.as_view()),
     path('api/auth/user/', UserAPI.as_view()),
-    path('api/auth/scrapbooks/', ScrapbookAPI.as_view()),
-    path('api/auth/followlist/<int:pk>/', FollowListCreateAPI.as_view()),
-    path('api/auth/deletefollow/<int:pk>/', FollowDestroyAPI.as_view()),
     path('api/auth/searchUsers/', SearchUsersAPI.as_view()),
+
+    # Scrapbook APIs
+    path('api/auth/scrapbooks/', ScrapbookAPI.as_view()),
     path('api/auth/deletescrapbook/<int:pk>/', ScrapbookDestroyAPI.as_view()),
 
-    # path('api/auth/page/<int:pk>', PageAPI.as_view()),
+    # Following APIs
+    path('api/auth/followlist/<int:pk>/', FollowListCreateAPI.as_view()),
+    path('api/auth/deletefollow/<int:pk>/', FollowDestroyAPI.as_view()),
+
+    # Like APIs
+    path('api/auth/likes/<int:pk>', PageLikesListAPI.as_view()),
+    # ^ shows all likes from page[PK]
+    path('api/auth/deletelike/<int:pk>/', PageLikesDeleteAPI.as_view()),
+    # ^ Deletes like[PK]
+    path('api/auth/userlikes/<int:pk>/', UserLikesAPI.as_view()),
+    # ^ shows all like from user[PK]
+
+
 
 
 
