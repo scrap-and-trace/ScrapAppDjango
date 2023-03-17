@@ -6,7 +6,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from knox.models import AuthToken
 from .serializers import (UserSerializer, RegisterSerializer, LoginSerializer,
-                          ScrapbookSerializer, FollowSerializer, CommentSerializer, FollowCreateSerializer,
+                          ScrapbookSerializer, FollowSerializer, CommentSerializer, FollowSimpleSerializer,
                           PageSerializer, CommentCreateSerializer, LikeSerializer, LikeListSerializer)
 from .models import CustomUser, Scrapbook, Follow, Comment, Page, PageLikes
 from django.shortcuts import get_object_or_404
@@ -140,7 +140,7 @@ class FollowListCreateAPI(generics.ListCreateAPIView):
 
     def get_serializer_class(self):
         if (self.request.method == "POST"):
-            serializer_class = FollowCreateSerializer
+            serializer_class = FollowSimpleSerializer
         else:
             serializer_class = FollowSerializer
 

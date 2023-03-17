@@ -39,7 +39,7 @@ class ScrapbookSerializer(serializers.ModelSerializer):
 #         fields = '__all__'
 
 
-class FollowCreateSerializer(serializers.ModelSerializer):
+class FollowSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Follow
         fields = ['id', 'follower', 'scrapbook', ]
@@ -145,12 +145,12 @@ class CommentCreateSerializer(serializers.ModelSerializer):
 
 class PageSerializer(serializers.ModelSerializer):
     comments = serializers.SerializerMethodField()
-    no_of_likes = serializers.SerializerMethodField()
+    likes_list = serializers.SerializerMethodField()
 
     class Meta:
         model = Page
         fields = ['id', 'title', 'body',
-                  'date_created', 'scrapbook', 'comments', 'longitude', 'latitude', 'no_of_likes', ]
+                  'date_created', 'scrapbook', 'comments', 'longitude', 'latitude', 'likes_list', ]
 
     def get_comments(self, page):
         comments = Comment.objects.filter(page=page)
@@ -164,12 +164,12 @@ class PageSerializer(serializers.ModelSerializer):
             })
         return comment_data
 
-    def get_no_of_likes(self, page):
+    def get_likes_list(self, page):
         likes = PageLikes.objects.filter(liked_page=page)
-        count = 0
+        likes_list = []
         for like in likes:
-            count += 1
-        return count
+            likes_list.append(like.liker.id)
+        return likes_list
 
 
 class LikeListSerializer(serializers.ModelSerializer):
@@ -192,8 +192,4 @@ class LikeSerializer(serializers.ModelSerializer):
         liker_data = {
             'liker_username': user.username,
         }
-        # liker_data.append({
-        #     'liker_id': liker.id,
-        #     'liker_username': liker.username,
-        # })
         return liker_data
