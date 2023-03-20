@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 
 from django.urls import path, include
-from accounts.api import (RegisterAPI, LoginAPI, UserAPI, ScrapbookAPI, FollowListCreateAPI,
+from accounts.api import (RegisterAPI, LoginAPI, LogoutAPI, UserAPI, ScrapbookAPI, FollowListCreateAPI,
                           FollowDestroyAPI, SearchUsersAPI, ScrapbookDestroyAPI, PageLikesListAPI,
                           PageLikesDeleteAPI, UserLikesAPI,)
 from accounts.api import UserViewSet, PageAPI, CommentViewSet
@@ -40,6 +40,7 @@ urlpatterns = [
     # User APIs
     path('api/auth/register/', RegisterAPI.as_view()),
     path('api/auth/login/', LoginAPI.as_view()),
+    path('api/auth/logout/', LogoutAPI.as_view()),
     path('api/auth/user/', UserAPI.as_view()),
     path('api/auth/searchUsers/', SearchUsersAPI.as_view()),
 
@@ -52,7 +53,7 @@ urlpatterns = [
     path('api/auth/deletefollow/<int:pk>/', FollowDestroyAPI.as_view()),
 
     # Like APIs
-    path('api/auth/likes/<int:pk>', PageLikesListAPI.as_view()),
+    path('api/auth/likes/<int:pk>/', PageLikesListAPI.as_view()),
     # ^ shows all likes from page[PK]
     path('api/auth/deletelike/<int:pk>/', PageLikesDeleteAPI.as_view()),
     # ^ Deletes like[PK]

@@ -10,7 +10,7 @@ from .serializers import (UserSerializer, RegisterSerializer, LoginSerializer,
                           PageSerializer, CommentCreateSerializer, LikeSerializer, LikeListSerializer)
 from .models import CustomUser, Scrapbook, Follow, Comment, Page, PageLikes
 from django.shortcuts import get_object_or_404
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 
 
 # Register API
@@ -47,6 +47,23 @@ class LoginAPI(generics.GenericAPIView):
         return Response({
             "user": UserSerializer(user, context=self.get_serializer_context()).data,
             "token": AuthToken.objects.create(user)[1]
+        })
+
+
+class LogoutAPI(generics.GenericAPIView):
+    serializer_class = LoginSerializer
+
+    def post(self, request, *args, **kwargs):
+        # Call the self's serializer_class to serialize the request's data
+        serializer = self.get_serializer(data=request.data)
+        # Check the data is in the right formart
+        serializer.is_valid(raise_exception=True)
+        # Check the data against db
+        user = serializer.validated_data
+        logout(request, user)
+
+        return Response({
+            "user": UserSerializer(user, context=self.get_serializer_context()).data.username + " has been logged out!"
         })
 
 
@@ -96,9 +113,9 @@ class UserViewSet(viewsets.ModelViewSet):
 
     # search_fields = ['first_name', 'last_name']
 
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filter_backends = [DjangoFilterBackend, ]
     filterset_fields = {
-        'id': ["exact"],  # note the 'in' field
+        'id': ["exact"],
     }
 
     def get_queryset(self):
