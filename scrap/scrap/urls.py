@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 
 from django.urls import path, include
-from accounts.api import (RegisterAPI, LoginAPI, LogoutAPI, UserAPI, ScrapbookAPI, FollowListCreateAPI,
+from accounts.api import (RegisterAPI, LoginView, UserAPI, ScrapbookAPI, FollowListCreateAPI,
                           FollowDestroyAPI, SearchUsersAPI, ScrapbookDestroyAPI, PageLikesListAPI,
                           PageLikesDeleteAPI, UserLikesAPI,)
 from accounts.api import UserViewSet, PageAPI, CommentViewSet

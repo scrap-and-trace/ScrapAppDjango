@@ -11,6 +11,8 @@ from .serializers import (UserSerializer, RegisterSerializer, LoginSerializer,
 from .models import CustomUser, Scrapbook, Follow, Comment, Page, PageLikes
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import login, logout
+from rest_framework.authentication import BasicAuthentication
+from knox.views import LoginView as KnoxLoginView
 
 
 # Register API
@@ -31,7 +33,8 @@ class RegisterAPI(generics.GenericAPIView):
 
 
 # Login API
-class LoginAPI(generics.GenericAPIView):
+class LoginView(KnoxLoginView):
+    authentication_classes = [BasicAuthentication]
     serializer_class = LoginSerializer
 
     def post(self, request, *args, **kwargs):
@@ -50,15 +53,15 @@ class LoginAPI(generics.GenericAPIView):
         })
 
 
-class LogoutAPI(generics.GenericAPIView):
-    serializer_class = UserSerializer
+# class LogoutAPI(generics.GenericAPIView):
+#     serializer_class = UserSerializer
 
-    def post(self, request, *args, **kwargs):
-        logout(request)
+#     def post(self, request, *args, **kwargs):
+#         logout(request)
 
-        return Response({
-            'url': 'api/auth/login/'
-        })
+#         return Response({
+#             'url': 'api/auth/login/'
+#         })
 
 
 class UserAPI(generics.RetrieveAPIView):
