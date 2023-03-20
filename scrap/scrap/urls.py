@@ -20,7 +20,7 @@ from accounts.api import (RegisterAPI, LoginAPI, LogoutAPI, UserAPI, ScrapbookAP
                           FollowDestroyAPI, SearchUsersAPI, ScrapbookDestroyAPI, PageLikesListAPI,
                           PageLikesDeleteAPI, UserLikesAPI,)
 from accounts.api import UserViewSet, PageAPI, CommentViewSet
-from knox import views as knox_views
+from knox import views as knox
 
 
 from rest_framework import routers
@@ -39,8 +39,9 @@ urlpatterns = [
 
     # User APIs
     path('api/auth/register/', RegisterAPI.as_view()),
-    path('api/auth/login/', LoginAPI.as_view()),
-    path('api/auth/logout/', LogoutAPI.as_view()),
+    url(r'api/auth/', include('knox.urls'))
+    # path('api/auth/login/', LoginAPI.as_view()),
+    # path('api/auth/logout/', LogoutAPI.as_view()),
     path('api/auth/user/', UserAPI.as_view()),
     path('api/auth/searchUsers/', SearchUsersAPI.as_view()),
 
