@@ -13,6 +13,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth import login, logout
 # from rest_framework.authentication import BasicAuthentication
 from knox.views import LoginView as KnoxLoginView
+from knox.auth import TokenAuthentication
 
 
 # Register API
@@ -35,6 +36,7 @@ class RegisterAPI(generics.GenericAPIView):
 # Login API
 class LoginAPI(generics.GenericAPIView):
     serializer_class = LoginSerializer
+    authentication_classes = (TokenAuthentication,)
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request, *args, **kwargs):
@@ -65,6 +67,8 @@ class LoginAPI(generics.GenericAPIView):
 
 
 class UserAPI(generics.RetrieveAPIView):
+    authentication_classes = (TokenAuthentication,)
+
     permission_classes = [
         permissions.IsAuthenticated,
     ]
@@ -228,7 +232,9 @@ class PageLikesListAPI(generics.ListCreateAPIView):
         queryset = PageLikes.objects.filter(liker=request.user)
         check = queryset.objects.filter(liked_page=like.liked_page)
         if not check:
-            super().post(self, request, *args, **kwargs)
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
         else:
             return Response('This user has already liked this page')
 
