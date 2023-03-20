@@ -39,7 +39,7 @@ urlpatterns = [
 
     # User APIs
     path('api/auth/register/', RegisterAPI.as_view()),
-    url(r'api/auth/', include('knox.urls'))
+    path(r'api/auth/', include('knox.urls')),
     # path('api/auth/login/', LoginAPI.as_view()),
     # path('api/auth/logout/', LogoutAPI.as_view()),
     path('api/auth/user/', UserAPI.as_view()),
