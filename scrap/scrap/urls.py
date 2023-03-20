@@ -16,11 +16,11 @@ Including another URLconf
 from django.contrib import admin
 
 from django.urls import path, include
-from accounts.api import (RegisterAPI, LoginView, UserAPI, ScrapbookAPI, FollowListCreateAPI,
+from accounts.api import (RegisterAPI, LoginAPI, UserAPI, ScrapbookAPI, FollowListCreateAPI,
                           FollowDestroyAPI, SearchUsersAPI, ScrapbookDestroyAPI, PageLikesListAPI,
                           PageLikesDeleteAPI, UserLikesAPI,)
 from accounts.api import UserViewSet, PageAPI, CommentViewSet
-from knox import views as knox
+from knox import views as knox_views
 
 
 from rest_framework import routers
@@ -39,8 +39,11 @@ urlpatterns = [
 
     # User APIs
     path('api/auth/register/', RegisterAPI.as_view()),
-    path(r'api/auth/', include('knox.urls')),
-    # path('api/auth/login/', LoginAPI.as_view()),
+    # path(r'api/auth/', include('knox.urls')),
+    path('api/auth/logout/', knox_views.LogoutView.as_view(), name='knox_logout'),
+    path('api/auth/logoutall/', knox_views.LogoutAllView.as_view(),
+         name='knox_logoutall'),
+    path('api/auth/login/', LoginAPI.as_view()),
     # path('api/auth/logout/', LogoutAPI.as_view()),
     path('api/auth/user/', UserAPI.as_view()),
     path('api/auth/searchUsers/', SearchUsersAPI.as_view()),
