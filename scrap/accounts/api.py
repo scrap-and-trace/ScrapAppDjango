@@ -11,9 +11,8 @@ from .serializers import (UserSerializer, RegisterSerializer, LoginSerializer,
 from .models import CustomUser, Scrapbook, Follow, Comment, Page, PageLikes
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import login, logout
-# from rest_framework.authentication import BasicAuthentication
-from knox.views import LoginView as KnoxLoginView
 from knox.auth import TokenAuthentication
+from django.core.exceptions import NON_FIELD_ERRORS, ValidationError, ObjectDoesNotExist
 
 
 # Register API
@@ -228,15 +227,18 @@ class PageLikesListAPI(generics.ListCreateAPIView):
         return PageLikes.objects.filter(liked_page=likes)
 
     def post(self, request, *args, **kwargs):
-        like = self.get_object()
-        queryset = PageLikes.objects.filter(liker=request.user)
-        check = queryset.objects.filter(liked_page=like.liked_page)
-        if not check:
-            serializer = self.get_serializer(data=request.data)
+        body = request.data
+        page_likes = PageLikes.objects.filter(
+            liked_page=body['liked_page'])
+        try:
+            like = page_likes.get(liker=request.user)
+            return Response("This already exists!")
+        except PageLikes.DoesNotExist:
+            serializer = self.get_serializer(data=body)
             serializer.is_valid(raise_exception=True)
-            serializer.save()
-        else:
-            return Response('This user has already liked this page')
+            like = serializer.validated_data
+            like = serializer.save()
+            return Response("Liked!")
 
 
 class PageLikesDeleteAPI(mixins.DestroyModelMixin, generics.GenericAPIView):
@@ -244,12 +246,18 @@ class PageLikesDeleteAPI(mixins.DestroyModelMixin, generics.GenericAPIView):
     serializer_class = LikeSerializer
 
     def delete(self, request, *args, **kwargs):
-        like = self.get_object()
-        queryset = PageLikes.objects.filter(liker=request.user)
-        check = queryset.objects.filter(liked_page=like.liked_page)
-        if check:
-            return self.destroy(request, *args, **kwargs)
-        else:
+        page_likes = PageLikes.objects.filter(
+            liked_page=self.kwargs['pk'])
+        try:
+            like = page_likes.get(liker=request.user.id)
+            # return Response(LikeSerializer(like).data)
+            # return self.destroy(like)
+            like.delete()
+            content = {
+                'Success': 'Like deleted!'
+            }
+            return Response(content, status=204)
+        except PageLikes.DoesNotExist:
             content = {
                 'Error': 'Like does not exist'
             }

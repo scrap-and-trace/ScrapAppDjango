@@ -60,7 +60,7 @@ urlpatterns = [
     path('api/auth/likes/<int:pk>/', PageLikesListAPI.as_view()),
     # ^ shows all likes from page[PK]
     path('api/auth/deletelike/<int:pk>/', PageLikesDeleteAPI.as_view()),
-    # ^ Deletes like[PK]
+    # ^ Deletes like on page[pk] from request's user
     path('api/auth/userlikes/<int:pk>/', UserLikesAPI.as_view()),
     # ^ shows all like from user[PK]
 
