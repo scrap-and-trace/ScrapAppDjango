@@ -220,18 +220,31 @@ class PageLikesListAPI(generics.ListCreateAPIView):
         likes = self.kwargs['pk']
         return PageLikes.objects.filter(liked_page=likes)
 
+    def post(self, request, *args, **kwargs):
+        like = self.get_object()
+        queryset = PageLikes.objects.filter(liker=request.user)
+        check = queryset.objects.filter(liked_page=like.liked_page)
+        if not check:
+            super().post(self, request, *args, **kwargs)
+        else:
+            return Response('This user has already liked this page')
+
 
 class PageLikesDeleteAPI(mixins.DestroyModelMixin, generics.GenericAPIView):
     queryset = PageLikes.objects.all()
     serializer_class = LikeSerializer
 
     def delete(self, request, *args, **kwargs):
-        like = PageLikes.objects.get(id=self.kwargs['pk'])
-        if like.liker != request.user:
+        like = self.get_object()
+        queryset = PageLikes.objects.filter(liker=request.user)
+        check = queryset.objects.filter(liked_page=like.liked_page)
+        if check:
+            return self.destroy(request, *args, **kwargs)
+        else:
             content = {
-                'Error': 'You cannot remove someone else\'s like for them!'}
+                'Error': 'Like does not exist'
+            }
             return Response(content, status=status.HTTP_403_FORBIDDEN)
-        return self.destroy(request, *args, **kwargs)
 
 
 class UserLikesAPI(generics.ListAPIView):

@@ -52,7 +52,7 @@ class TextElement(models.Model):
 class ImageElement(models.Model):
     page = models.ForeignKey(
         Page, on_delete=models.CASCADE, related_name='ImageElements')
-    # Image uri need or something??
+    # url =
     xCoord = models.IntegerField()
     yCoord = models.IntegerField()
 
@@ -73,8 +73,10 @@ class Follow(models.Model):
 
 
 class PageLikes(models.Model):
-    liker = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='liker')
-    liked_page = models.ForeignKey(Page, on_delete=models.CASCADE, related_name='liked_page')
+    liker = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, related_name='liker')
+    liked_page = models.ForeignKey(
+        Page, on_delete=models.CASCADE, related_name='liked_page')
 
 
 # class Friend(models.Model):
