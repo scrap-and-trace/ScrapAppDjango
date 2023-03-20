@@ -12,7 +12,7 @@ class CustomUser(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', ]
 
-    # profile_pic = models.ImageField(
+    # profile_pic = models.CharField(
     #     default='default.jpg', upload_to='profile_pics')
     phone = PhoneNumberField(blank=True)
     dob = models.DateField(blank=True, null=True)

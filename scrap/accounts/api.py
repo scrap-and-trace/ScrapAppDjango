@@ -51,7 +51,7 @@ class LoginAPI(generics.GenericAPIView):
 
 
 class LogoutAPI(generics.GenericAPIView):
-    serializer_class = LoginSerializer
+    serializer_class = UserSerializer
 
     def post(self, request, *args, **kwargs):
         # Call the self's serializer_class to serialize the request's data
