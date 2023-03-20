@@ -56,7 +56,9 @@ class LogoutAPI(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         logout(request)
 
-        return redirect('api/auth/login/')
+        return Response({
+            'url': 'api/auth/login/'
+        })
 
 
 class UserAPI(generics.RetrieveAPIView):
