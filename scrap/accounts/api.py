@@ -56,9 +56,9 @@ class LogoutAPI(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         logout(request)
 
-        # return Response({
-        #     "user": UserSerializer(user, context=self.get_serializer_context()).data.username + " has been logged out!"
-        # })
+        return Response({
+            "Logged out!"
+        })
 
 
 class UserAPI(generics.RetrieveAPIView):
