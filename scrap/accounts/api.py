@@ -54,17 +54,11 @@ class LogoutAPI(generics.GenericAPIView):
     serializer_class = UserSerializer
 
     def post(self, request, *args, **kwargs):
-        # Call the self's serializer_class to serialize the request's data
-        serializer = self.get_serializer(data=request.data)
-        # Check the data is in the right formart
-        serializer.is_valid(raise_exception=True)
-        # Check the data against db
-        user = serializer.validated_data
-        logout(request, user)
+        logout(request)
 
-        return Response({
-            "user": UserSerializer(user, context=self.get_serializer_context()).data.username + " has been logged out!"
-        })
+        # return Response({
+        #     "user": UserSerializer(user, context=self.get_serializer_context()).data.username + " has been logged out!"
+        # })
 
 
 class UserAPI(generics.RetrieveAPIView):
