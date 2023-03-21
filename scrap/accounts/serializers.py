@@ -74,7 +74,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'first_name',
+        fields = ['id', 'username', 'image_url', 'delete_url', 'first_name',
                   'last_name', 'email', 'dob', 'phone', 'following', 'scrapbooks', ]
 
     def get_following(self, user):
@@ -97,7 +97,8 @@ class RegisterSerializer(serializers.ModelSerializer):
                   'last_name', 'email', 'dob', 'phone', 'password']
         extra_kwargs = {'password': {'write_only': True}}
 
-    def create(self, validated_data):
+    def create(self, data):
+        validated_data = data.is_valid()
         password = validated_data.pop('password')
         user = super().create(validated_data)
         user.set_password(password)
@@ -143,14 +144,22 @@ class CommentCreateSerializer(serializers.ModelSerializer):
         fields = ['authorid', 'page', 'body']
 
 
+class PageCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Page
+        fields = ['id', 'title', 'body', 'image_url',
+                  'delete_url', 'scrapbook', 'longitude', 'latitude', ]
+        extra_kwargs = {'image_url': {'write_only': True},
+                        'delete_url': {'write_only': True}}
+
+
 class PageSerializer(serializers.ModelSerializer):
     comments = serializers.SerializerMethodField()
     likes_list = serializers.SerializerMethodField()
-    image_data = serializers.SerializerMethodField()
 
     class Meta:
         model = Page
-        fields = ['id', 'title', 'body', 'image_data',
+        fields = ['id', 'title', 'body',  'image_url', 'delete_url',
                   'date_created', 'scrapbook', 'comments', 'longitude', 'latitude', 'likes_list', ]
 
     def get_comments(self, page):
@@ -171,18 +180,6 @@ class PageSerializer(serializers.ModelSerializer):
         for like in likes:
             likes_list.append(like.liker.id)
         return likes_list
-
-    def get_image_data(self, page):
-        images = ImageElement.objects.filter(page=page)
-        images_urls = []
-        for image in images:
-            images_urls.append({
-                "thumbnail": image.thumbnail,
-                "display_url": image.display_url,
-                "delete_url": image.delete_url,
-                "image_large": image.image_large
-            })
-        return images_urls
 
 
 class LikeListSerializer(serializers.ModelSerializer):

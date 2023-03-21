@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from knox.models import AuthToken
 from .serializers import (UserSerializer, RegisterSerializer, LoginSerializer,
                           ScrapbookSerializer, FollowSerializer, CommentSerializer, FollowSimpleSerializer,
-                          PageSerializer, CommentCreateSerializer, LikeSerializer, LikeListSerializer)
+                          PageSerializer, CommentCreateSerializer, LikeSerializer, LikeListSerializer, PageCreateSerializer)
 from .models import CustomUser, Scrapbook, Follow, Comment, Page, PageLikes
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import login, logout
@@ -23,11 +23,11 @@ class RegisterAPI(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-
         print("User created")
+        data = UserSerializer(user, context=self.get_serializer_context()).data
 
         return Response({
-            "user": UserSerializer(user, context=self.get_serializer_context()).data,
+            "user": data,
             "token": AuthToken.objects.create(user)[1]
         })
 
@@ -52,17 +52,6 @@ class LoginAPI(generics.GenericAPIView):
             "user": UserSerializer(user, context=self.get_serializer_context()).data,
             "token": AuthToken.objects.create(user)[1]
         })
-
-
-# class LogoutAPI(generics.GenericAPIView):
-#     serializer_class = UserSerializer
-
-#     def post(self, request, *args, **kwargs):
-#         logout(request)
-
-#         return Response({
-#             'url': 'api/auth/login/'
-#         })
 
 
 class UserAPI(generics.RetrieveAPIView):
@@ -190,12 +179,24 @@ class SearchUsersAPI(generics.ListAPIView):
 
 class PageAPI(viewsets.ModelViewSet):
     queryset = Page.objects.all()
-    serializer_class = PageSerializer
-
     filter_backends = [DjangoFilterBackend, ]
     filterset_fields = {
         'id': ["exact"],
     }
+
+    def get_serializer_class(self):
+        if (self.request.method == "POST"):
+            serializer_class = PageCreateSerializer
+        else:
+            serializer_class = PageSerializer
+
+        return serializer_class
+
+    def create(self, page_data):
+        serializer = PageCreateSerializer(data=page_data.data)
+        serializer.is_valid()
+        serializer.save()
+        return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
         page = self.get_object()

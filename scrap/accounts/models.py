@@ -11,14 +11,22 @@ class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', ]
-
-    # profile_pic = models.CharField(
-    #     default='default.jpg', upload_to='profile_pics')
     phone = PhoneNumberField(blank=True)
     dob = models.DateField(blank=True, null=True)
+    image_url = models.CharField(
+        max_length=100, blank=True, default='https://i.ibb.co/V9G9x5p/e73a38fc9156.png')
+    delete_url = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
         return self.email
+
+
+# class ProfilePicture(models.Model):
+#     user = models.ForeignKey(
+#         CustomUser, on_delete=models.CASCADE, related_name='user')
+    # image_url = models.CharField(
+    #     max_length=100, blank=True, default='https://i.ibb.co/V9G9x5p/e73a38fc9156.png', null=True)
+    # delete_url = models.CharField(max_length=100, blank=True)
 
 
 class Scrapbook(models.Model):
@@ -39,6 +47,8 @@ class Page(models.Model):
         max_digits=9, decimal_places=6, blank=True, null=True)
     title = models.CharField(max_length=20)
     body = models.CharField(max_length=255)
+    image_url = models.CharField(max_length=100, blank=True)
+    delete_url = models.CharField(max_length=100, blank=True)
 
 
 class TextElement(models.Model):
@@ -54,10 +64,8 @@ class ImageElement(models.Model):
         Page, on_delete=models.CASCADE, related_name='ImageElements')
     # xCoord = models.IntegerField()
     # yCoord = models.IntegerField()
-    thumbnail = models.CharField(max_length=100, blank=True)
-    display_url = models.CharField(max_length=100, blank=True)
+    image_url = models.CharField(max_length=100, blank=True)
     delete_url = models.CharField(max_length=100, blank=True)
-    image_large = models.CharField(max_length=100, blank=True)
 
 
 class Comment(models.Model):
