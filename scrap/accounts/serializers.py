@@ -98,7 +98,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, data):
-        validated_data = data.is_valid()
         password = validated_data.pop('password')
         user = super().create(validated_data)
         user.set_password(password)
