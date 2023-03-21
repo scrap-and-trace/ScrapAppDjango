@@ -250,7 +250,7 @@ class PageLikesDeleteAPI(mixins.DestroyModelMixin, generics.GenericAPIView):
         page_likes = PageLikes.objects.filter(
             liked_page=self.kwargs['pk'])
         try:
-            like = page_likes.get(liker=request.user.id)
+            like = page_likes.get(liker=request.user)
             like.delete()
             content = {
                 'Success': 'Like deleted!'
