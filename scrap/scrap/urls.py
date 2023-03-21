@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from accounts.api import (RegisterAPI, LoginAPI, UserAPI, ScrapbookAPI, FollowListCreateAPI,
                           FollowDestroyAPI, SearchUsersAPI, ScrapbookDestroyAPI, PageLikesListAPI,
-                          PageLikesDeleteAPI, UserLikesAPI,)
+                          PageLikesDeleteAPI, PageLikedAPI, UserLikesAPI,)
 from accounts.api import UserViewSet, PageAPI, CommentViewSet
 from knox import views as knox_views
 
@@ -63,7 +63,7 @@ urlpatterns = [
     # ^ Deletes like on page[pk] from request's user
     path('api/auth/userlikes/<int:pk>/', UserLikesAPI.as_view()),
     # ^ shows all like from user[PK]
-
+    path(('api/auth/isliked/<int:pk>/'), PageLikedAPI.as_view()),
 
 
 

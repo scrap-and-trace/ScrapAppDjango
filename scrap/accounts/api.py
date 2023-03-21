@@ -263,6 +263,19 @@ class PageLikesDeleteAPI(mixins.DestroyModelMixin, generics.GenericAPIView):
             return Response(content, status=status.HTTP_403_FORBIDDEN)
 
 
+class PageLikedAPI(generics.GenericAPIView):
+    serializer_class = LikeListSerializer
+
+    def get(self, request, *args, **kwargs):
+        page_likes = PageLikes.objects.filter(
+            liked_page=self.kwargs['pk'])
+        try:
+            like = page_likes.get(liker=request.user)
+            return Response(True)
+        except PageLikes.DoesNotExist:
+            return Response(False)
+
+
 class UserLikesAPI(generics.ListAPIView):
     serializer_class = LikeListSerializer
 
