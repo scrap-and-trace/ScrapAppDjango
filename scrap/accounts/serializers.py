@@ -146,10 +146,11 @@ class CommentCreateSerializer(serializers.ModelSerializer):
 class PageSerializer(serializers.ModelSerializer):
     comments = serializers.SerializerMethodField()
     likes_list = serializers.SerializerMethodField()
+    image_data = serializers.SerializerMethodField()
 
     class Meta:
         model = Page
-        fields = ['id', 'title', 'body',
+        fields = ['id', 'title', 'body', 'image_data',
                   'date_created', 'scrapbook', 'comments', 'longitude', 'latitude', 'likes_list', ]
 
     def get_comments(self, page):
@@ -170,6 +171,18 @@ class PageSerializer(serializers.ModelSerializer):
         for like in likes:
             likes_list.append(like.liker.id)
         return likes_list
+
+    def get_image_data(self, page):
+        images = ImageElement.objects.filter(page=page)
+        images_urls = []
+        for image in images:
+            images_urls.append({
+                "thumbnail": image.thumbnail,
+                "display_url": image.display_url,
+                "delete_url": image.delete_url,
+                "image_large": image.image_large
+            })
+        return images_urls
 
 
 class LikeListSerializer(serializers.ModelSerializer):

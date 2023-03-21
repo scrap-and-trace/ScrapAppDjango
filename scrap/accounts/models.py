@@ -52,9 +52,12 @@ class TextElement(models.Model):
 class ImageElement(models.Model):
     page = models.ForeignKey(
         Page, on_delete=models.CASCADE, related_name='ImageElements')
-    # url =
-    xCoord = models.IntegerField()
-    yCoord = models.IntegerField()
+    # xCoord = models.IntegerField()
+    # yCoord = models.IntegerField()
+    thumbnail = models.CharField(max_length=100, blank=True)
+    display_url = models.CharField(max_length=100, blank=True)
+    delete_url = models.CharField(max_length=100, blank=True)
+    image_large = models.CharField(max_length=100, blank=True)
 
 
 class Comment(models.Model):
