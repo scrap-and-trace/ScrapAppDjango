@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import CustomUser, TextElement, ImageElement, Scrapbook, Page, Comment, Follow, PageLikes
 from django.contrib.auth import authenticate
 from django.http import JsonResponse, response
+from django.contrib.auth.password_validation import validate_password
 
 
 class ScrapbookSerializer(serializers.ModelSerializer):
@@ -25,18 +26,6 @@ class ScrapbookSerializer(serializers.ModelSerializer):
                 'title': page.title
             })
         return page_data
-
-
-# class TextElementSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = TextElement
-#         fields = '__all__'
-
-
-# class ImageElementSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = ImageElement
-#         fields = '__all__'
 
 
 class FollowSimpleSerializer(serializers.ModelSerializer):
@@ -99,13 +88,55 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         password = validated_data.pop('password')
+        validate_password(password)
         user = super().create(validated_data)
         user.set_password(password)
         user.save()
         return user
 
 
+class ChangePasswordSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(
+        write_only=True, required=True, validators=[validate_password])
+    password2 = serializers.CharField(write_only=True, required=True)
+    old_password = serializers.CharField(write_only=True, required=True)
+
+    class Meta:
+        model = CustomUser
+        fields = ('old_password', 'password', 'password2')
+
+    def validate(self, attrs):
+        if attrs['password'] != attrs['password2']:
+            raise serializers.ValidationError(
+                {"password": "Password fields didn't match."})
+
+        return attrs
+
+    def validate_old_password(self, value):
+        user = None
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            user = request.user
+        if not user.check_password(value):
+            raise serializers.ValidationError(
+                {"old_password": "Old password is not correct"})
+        return value
+
+    def update(self, instance, validated_data):
+        user = self.context['request'].user
+
+        if user.pk != instance.pk:
+            raise serializers.ValidationError(
+                {"authorize": "You dont have permission for this user."})
+
+        instance.set_password(validated_data['password'])
+        instance.save()
+
+        return instance
+
 # Login Serializer
+
+
 class LoginSerializer(serializers.Serializer):
     email = serializers.CharField()
     password = serializers.CharField()

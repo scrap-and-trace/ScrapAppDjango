@@ -5,19 +5,22 @@ from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from knox.models import AuthToken
-from .serializers import (UserSerializer, RegisterSerializer, LoginSerializer,
+from .serializers import (UserSerializer, RegisterSerializer, LoginSerializer, ChangePasswordSerializer,
                           ScrapbookSerializer, FollowSerializer, CommentSerializer, FollowSimpleSerializer,
-                          PageSerializer, CommentCreateSerializer, LikeSerializer, LikeListSerializer, PageCreateSerializer)
+                          PageSerializer, CommentCreateSerializer, LikeSerializer, LikeListSerializer,
+                          PageCreateSerializer)
 from .models import CustomUser, Scrapbook, Follow, Comment, Page, PageLikes
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import login, logout
 from knox.auth import TokenAuthentication
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError, ObjectDoesNotExist
+from rest_framework.decorators import action
 
 
 # Register API
 class RegisterAPI(generics.GenericAPIView):
     serializer_class = RegisterSerializer
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -35,8 +38,7 @@ class RegisterAPI(generics.GenericAPIView):
 # Login API
 class LoginAPI(generics.GenericAPIView):
     serializer_class = LoginSerializer
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request, *args, **kwargs):
         # Call the self's serializer_class to serialize the request's data
@@ -100,8 +102,6 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
 
-    # search_fields = ['first_name', 'last_name']
-
     filter_backends = [DjangoFilterBackend, ]
     filterset_fields = {
         'id': ["exact"],
@@ -121,6 +121,19 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+
+    @action(detail=True, methods=['POST'])
+    def set_password(self, request, pk=None):
+        user = self.get_object()
+        serializer = ChangePasswordSerializer(
+            data=request.data,  context={'request': request})
+        if serializer.is_valid():
+            user.set_password(serializer.validated_data['password'])
+            user.save()
+            return Response({'status': 'password set'})
+        else:
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
