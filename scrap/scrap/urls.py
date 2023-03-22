@@ -54,7 +54,10 @@ urlpatterns = [
 
     # Following APIs
     path('api/auth/followlist/<int:pk>/', FollowListCreateAPI.as_view()),
+    # ^ GET shows the scrapbooks the user follows
+    # ^ POST creates new follow from user to the Scrapbook[pk]
     path('api/auth/deletefollow/<int:pk>/', FollowDestroyAPI.as_view()),
+    # ^ DELETE deletes the follow from user to Scrapbook[pk]
 
     # Like APIs
     path('api/auth/likes/<int:pk>/', PageLikesListAPI.as_view()),

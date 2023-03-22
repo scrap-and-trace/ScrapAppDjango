@@ -169,17 +169,41 @@ class FollowListCreateAPI(generics.ListCreateAPIView):
         is_following = self.kwargs['pk']
         return Follow.objects.filter(follower=is_following)
 
+    def post(self, request, *args, **kwargs):
+        body = request.data
+        follows = Follow.objects.filter(
+            scrapbook=body['scrapbook'])
+        try:
+            follow = follows.get(follower=request.user)
+            return Response("You already follow this user!")
+        except Follow.DoesNotExist:
+            body.update({"follower": request.user.id})
+            serializer = self.get_serializer(data=body)
+            serializer.is_valid(raise_exception=True)
+            like = serializer.validated_data
+            like = serializer.save()
+            return Response("Followed!")
+
 
 class FollowDestroyAPI(mixins.DestroyModelMixin, generics.GenericAPIView):
     queryset = Follow.objects.all()
     serializer_class = FollowSerializer
 
     def delete(self, request, *args, **kwargs):
-        follow = Follow.objects.get(id=self.kwargs['pk'])
-        if follow.follower != request.user:
-            content = {'Error': 'You cannot unfollow someone else for them!'}
+        follows = Follow.objects.filter(
+            scrapbook=self.kwargs['pk'])
+        try:
+            follow = follows.get(follower=request.user)
+            follow.delete()
+            content = {
+                'Successfully unfollowed!'
+            }
+            return Response(content, status=204)
+        except Follow.DoesNotExist:
+            content = {
+                'Error: You don\'t follow this scrapbook'
+            }
             return Response(content, status=status.HTTP_403_FORBIDDEN)
-        return self.destroy(request, *args, **kwargs)
 
 
 class SearchUsersAPI(generics.ListAPIView):
