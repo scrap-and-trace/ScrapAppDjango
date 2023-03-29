@@ -21,14 +21,6 @@ class CustomUser(AbstractUser):
         return self.email
 
 
-# class ProfilePicture(models.Model):
-#     user = models.ForeignKey(
-#         CustomUser, on_delete=models.CASCADE, related_name='user')
-    # image_url = models.CharField(
-    #     max_length=100, blank=True, default='https://i.ibb.co/V9G9x5p/e73a38fc9156.png', null=True)
-    # delete_url = models.CharField(max_length=100, blank=True)
-
-
 class Scrapbook(models.Model):
     author = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, related_name='scrapbooks')
@@ -47,23 +39,6 @@ class Page(models.Model):
         max_digits=9, decimal_places=6, blank=True, null=True)
     title = models.CharField(max_length=20)
     body = models.CharField(max_length=255)
-    image_url = models.CharField(max_length=100, blank=True)
-    delete_url = models.CharField(max_length=100, blank=True)
-
-
-class TextElement(models.Model):
-    page = models.ForeignKey(
-        Page, on_delete=models.CASCADE, related_name='TextElements')
-    text = models.CharField(max_length=255)
-    xCoord = models.IntegerField()
-    yCoord = models.IntegerField()
-
-
-class ImageElement(models.Model):
-    page = models.ForeignKey(
-        Page, on_delete=models.CASCADE, related_name='ImageElements')
-    # xCoord = models.IntegerField()
-    # yCoord = models.IntegerField()
     image_url = models.CharField(max_length=100, blank=True)
     delete_url = models.CharField(max_length=100, blank=True)
 
@@ -90,6 +65,7 @@ class PageLikes(models.Model):
         Page, on_delete=models.CASCADE, related_name='liked_page')
 
 
+# TODO
 # class Friend(models.Model):
 #     aFriend = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='sender')
 #     bFriend = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='receiver')
@@ -99,5 +75,3 @@ class PageLikes(models.Model):
 # class Block(models.Model):
 #     blocker = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='blocks')
 #     blocked = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='is_blocked')
-
-# Look at the premade github in app-dev-resources?

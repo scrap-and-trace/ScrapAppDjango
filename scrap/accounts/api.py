@@ -77,18 +77,11 @@ class ScrapbookAPI(generics.ListCreateAPIView):
     filterset_fields = {
         'id': ["exact"],  # note the 'in' field
     }
-    # permission_classes = [
-    #     permissions.IsAuthenticated,
-    # ]
 
 
 class ScrapbookDestroyAPI(mixins.DestroyModelMixin, generics.GenericAPIView):
     queryset = Scrapbook.objects.all()
     serializer_class = ScrapbookSerializer
-
-    # def get_queryset(self):
-    #     scrapbookid = self.kwargs['pk']
-    #     return Scrapbook.objects.filter(id=scrapbookid)
 
     def delete(self, request, *args, **kwargs):
         scrapbook = self.get_object()

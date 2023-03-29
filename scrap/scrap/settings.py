@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 import os
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -129,14 +130,6 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# Defining where media is stored (so the photos dont clutter the project)
-# this will be at the project's base in a media folder
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-# This is where Django will store media, i.e. profile_pics folder will be store here, and this is
-# the url Django uses to find the media
-MEDIA_URL = '/media/'
-
-
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
 
@@ -157,4 +150,6 @@ REST_FRAMEWORK = {
 
 REST_KNOX = {
     'USER_SERIALIZER': 'accounts.serializers.UserSerializer',
+    'AUTO_REFRESH': True,
+    'TOKEN_TTL': timedelta(weeks=24),
 }

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser, TextElement, ImageElement, Scrapbook, Page, Comment, Follow, PageLikes
+from .models import CustomUser, Scrapbook, Page, Comment, Follow, PageLikes
 from django.contrib.auth import authenticate
 from django.http import JsonResponse, response
 from django.contrib.auth.password_validation import validate_password
@@ -35,7 +35,6 @@ class FollowSimpleSerializer(serializers.ModelSerializer):
 
 
 class FollowSerializer(serializers.ModelSerializer):
-    # follower = UserSerializer(read_only=True)
     scrapbook = ScrapbookSerializer(read_only=True)
     user_details = serializers.SerializerMethodField()
 
@@ -57,7 +56,6 @@ class FollowSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    # following = FollowSerializer(many=True, read_only=True)
     following = serializers.SerializerMethodField()
     scrapbooks = ScrapbookSerializer(many=True, read_only=True)
 
