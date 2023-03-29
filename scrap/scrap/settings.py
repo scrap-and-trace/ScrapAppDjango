@@ -150,6 +150,5 @@ REST_FRAMEWORK = {
 
 REST_KNOX = {
     'USER_SERIALIZER': 'accounts.serializers.UserSerializer',
-    'AUTO_REFRESH': True,
-    'TOKEN_TTL': timedelta(weeks=24),
+    'TOKEN_TTL': None,
 }
